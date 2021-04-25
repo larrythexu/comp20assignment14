@@ -1,10 +1,10 @@
 {
-  "name": "sample",
+  "name": "stockticker",
   "version": "1.0.0",
-  "description": "my sample node app",
-  "main": "hello.js",
+  "description": "stock ticker app",
+  "main": "stocktickerfind.js",
   "scripts": {
-  "start": "node hello.js"
+  "start": "node stocktickerfind.js"
 },
   "repository": {
   "type": "git",
