@@ -10,8 +10,12 @@ const url = 'mongodb+srv://comp20lxu:comp20passwordheh@cluster0.3fjac.mongodb.ne
 http.createServer(function(req, res) {
     //obtain data
     if (req.url == "/"){
-      res.writeHead(301, {'Location': 'stockticker.html'});
-      res.end();
+      file = 'stockticker.html';
+      fs.readFile(file, function(err, txt) {
+          res.writeHead(200, {'Content-Type': 'text/html'});
+          res.write(txt);
+          res.end();
+      });
     } else if (req.url == "/stocktickerfind") {
       res.writeHead(200, {'Content-Type': 'text/html'});
       pdata = "";
