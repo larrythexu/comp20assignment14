@@ -8,13 +8,12 @@ const MongoClient = require('mongodb').MongoClient;
 const url = 'mongodb+srv://comp20lxu:comp20passwordheh@cluster0.3fjac.mongodb.net/comp20_stockticker?retryWrites=true&w=majority'
 
 http.createServer(function(req, res) {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-
     //obtain data
     if (req.url == "/"){
-      res.write("Home Page!");
+      res.writeHead(301, {'Location': 'stockticker.html'});
       res.end();
     } else if (req.url == "/stocktickerfind") {
+      res.writeHead(200, {'Content-Type': 'text/html'});
       pdata = "";
       req.on('data', data => {
         pdata += data.toString();
@@ -22,7 +21,7 @@ http.createServer(function(req, res) {
 
       req.on('end', () => {
         pdata = qs.parse(pdata);
-        
+
         //construct query
         var dataRadio = pdata['radiobtn'];
         var dataInput = pdata['input_data'];
@@ -71,6 +70,7 @@ http.createServer(function(req, res) {
         });
       });
     } else {
+      res.writeHead(200, {'Content-Type': 'text/html'});
       res.write("Unknown page request");
       res.end();
     }
