@@ -1,0 +1,77 @@
+//modules
+var http = require('http');
+var fs = require('fs');
+var qs = require('querystring');
+
+//mongo setup
+const MongoClient = require('mongodb').MongoClient;
+const url = 'mongodb+srv://comp20lxu:comp20passwordheh@cluster0.3fjac.mongodb.net/comp20_stockticker?retryWrites=true&w=majority'
+
+http.createServer(function(req, res) {
+    res.writeHead(200, {'Content-Type': 'text/html'});
+
+    //obtain data
+    if (req.url == "/"){
+      res.write("Home Page!");
+      res.end();
+    } else if (req.url == "/stocktickerfind") {
+      pdata = "";
+      req.on('data', data => {
+        pdata += data.toString();
+      });
+
+      req.on('end', () => {
+        pdata = qs.parse(pdata);
+        
+        //construct query
+        var dataRadio = pdata['radiobtn'];
+        var dataInput = pdata['input_data'];
+        var theQuery;
+
+        if (dataRadio == "stock") {
+            theQuery = {"tickerCode":dataInput};
+        } else if (dataRadio == "company"){
+            theQuery = {"companyName":dataInput};
+        } else {
+          console.log("Radio Button Error!");
+        }
+
+        //search through Mongo
+        MongoClient.connect(url, { useUnifiedTopology: true }, function(err, db) {
+          //check for error
+            if (err){
+                console.log("Connection error: " + err);
+                return;
+            }
+
+            //set object
+            var dbo = db.db("comp20_stockticker");
+            var coll = dbo.collection("companies");
+
+            var resultString = "";
+
+            coll.find(theQuery).toArray(function(err, items) {
+              if (err) {
+                console.log("Error: " + err);
+              } else if (items.length == 0){
+                res.write("No results found!");
+                res.end();
+              } else {
+                for (i = 0; i < items.length; i++) {
+                  resultString += items[i].companyName + " - "
+                  resultString += items[i].tickerCode;
+                  resultString += "<br>";
+                }
+
+                res.write(resultString);
+                res.end();
+              }
+              db.close();
+            });
+        });
+      });
+    } else {
+      res.write("Unknown page request");
+      res.end();
+    }
+}).listen(3000);
